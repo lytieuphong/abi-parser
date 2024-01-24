@@ -59,6 +59,7 @@ function App() {
   return (
     <main id="app">
       <h1>ABI Functions</h1>
+      <p>Select your abi.json file</p>
       <input type="file" ref={fileInputRef} onChange={handleFileChange} />
 
       <div className="main">
