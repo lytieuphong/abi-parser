@@ -46,7 +46,7 @@ function App() {
             const data = abiData.sort((a: any, b: any) =>
               a.name.localeCompare(b.name)
             );
-            setABIFunctions(data);
+            setABIFunctions(data); // test build
           }
         } catch (error) {
           console.error("Error parsing ABI JSON:", error);
