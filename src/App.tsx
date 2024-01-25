@@ -6,6 +6,8 @@ interface ABIFunction {
   type: string;
   types: any;
   inputs: any;
+  constant: boolean;
+  outputs: { name: string; type: string }[];
   // ...other properties from your ABI
 }
 function App() {
@@ -14,6 +16,7 @@ function App() {
   const [selectedABIFunctions, setSelectedABIFunctions] = useState<
     ABIFunction[]
   >([]);
+  const [filterType, setFilterType] = useState(""); // Initial filter is empty
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedABIFunctions((prevSelected: ABIFunction[]) => {
@@ -36,14 +39,23 @@ function App() {
     }
     const selectedFile = event.target.files[0];
     if (selectedFile) {
+      setSelectedABIFunctions([]);
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
           if (event.target) {
-            const abiData = JSON.parse(event.target.result as string);
+            const tmp = JSON.parse(event.target.result as string);
+            const abiData = tmp.filter((item: any) => item);
             console.log("abiData,", abiData);
             const data = abiData.sort((a: any, b: any) =>
-              a.name.localeCompare(b.name)
+              // a?.name.localeCompare(b.name)
+              {
+                const typeComparison = a.type.localeCompare(b.type);
+                if (typeComparison !== 0) {
+                  return typeComparison;
+                }
+                return a.name.localeCompare(b.name);
+              }
             );
             setABIFunctions(data);
           }
@@ -55,6 +67,12 @@ function App() {
       reader.readAsText(selectedFile);
     }
   };
+  const filterABIElements = (elements: ABIFunction[] | any[]): any[] => {
+    if (!filterType) {
+      return elements; // If no filter, return all elements
+    }
+    return elements.filter((element) => element.type === filterType);
+  };
 
   return (
     <main id="app">
@@ -63,32 +81,70 @@ function App() {
       <input type="file" ref={fileInputRef} onChange={handleFileChange} />
 
       <div className="main">
-        <ul>
-          {abiFunctions &&
-            abiFunctions.map((functionData, index) => (
-              <li key={index}>
-                <input
-                  type="checkbox"
-                  id={functionData.name}
-                  onChange={handleCheckboxChange}
-                />
-                <label htmlFor={functionData.name}>
-                  <span className="text-blue">{functionData.name}</span> (
-                  {functionData.inputs.map((arg: any) => (
-                    <span className="me-1">
-                      {arg.name}: <span className="text-muted">{arg.type}</span>
-                    </span>
-                  ))}
-                  )
-                </label>
-              </li>
-            ))}
-        </ul>
-        <h3>Selected abi methods</h3>
-        <textarea
-          value={JSON.stringify(selectedABIFunctions, null, 2)}
-          readOnly
-        />
+        <div className="d-flex">
+          <div className="col">
+            <h3>List functions and events</h3>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="">All</option>
+              <option value="function">Functions</option>
+              <option value="event">Events</option>
+            </select>
+            <ul>
+              {abiFunctions &&
+                filterABIElements(abiFunctions).map((functionData) => (
+                  <li key={`method-${functionData.name}`}>
+                    {functionData.type !== "constructor" && (
+                      <input
+                        type="checkbox"
+                        id={functionData.name}
+                        onChange={handleCheckboxChange}
+                      />
+                    )}
+                    <label htmlFor={functionData.name}>
+                      <span className="text-method">{functionData.type} </span>
+                      <span className="text-function">
+                        {functionData.name}
+                      </span>{" "}
+                      (
+                      {functionData.inputs &&
+                        functionData.inputs.map((arg: any, i: number) => (
+                          <span
+                            className="me-1"
+                            key={`arg-${functionData.name}-${i}`}
+                          >
+                            <span className="text-var"> {arg.name}</span>:{" "}
+                            <span className="text-type">{arg.type}</span>
+                          </span>
+                        ))}
+                      )
+                      {functionData.constant &&
+                        functionData.outputs.length > 0 && (
+                          <span>
+                            →{" "}
+                            {functionData.outputs.map((output: any) => (
+                              <span key={`output-${functionData.name}`}>
+                                {output.name && <span>{output.name}:</span>}
+                                <span className="text-type">{output.type}</span>
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                    </label>
+                  </li>
+                ))}
+            </ul>
+          </div>
+          <div className="col">
+            <h3>Selected abi methods</h3>
+            <textarea
+              value={JSON.stringify(selectedABIFunctions, null, 2)}
+              readOnly
+            />
+          </div>
+        </div>
       </div>
     </main>
   );

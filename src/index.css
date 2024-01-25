@@ -73,14 +73,31 @@ button:focus-visible {
 .text-muted {
   opacity: 0.5;
 }
+.text-type {
+  color: #7ab0c0;
+}
 .me-1 {
   margin-right: 5px;
 }
-.text-blue {
-  color: blue;
+.text-method {
+  color: #0000ff;
+}
+.text-function {
+  color: #795e26;
+}
+.text-var {
+  color: #001080;
 }
 
 textarea {
+  min-width: 500px;
   width: 100%;
   min-height: 500px;
+}
+.d-flex {
+  display: flex;
+  .col {
+    display: block;
+    padding: 1rem;
+  }
 }
