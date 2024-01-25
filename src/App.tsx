@@ -105,9 +105,10 @@ function App() {
                     )}
                     <label htmlFor={functionData.name}>
                       <span className="text-method">{functionData.type} </span>
-                      <span className="text-function">
-                        {functionData.name}
-                      </span>{" "}
+                      <span className="text-muted">
+                        {functionData?.stateMutability ?? ""}{" "}
+                      </span>
+                      <span className="text-function">{functionData.name}</span>{" "}
                       (
                       {functionData.inputs &&
                         functionData.inputs.map((arg: any, i: number) => (
@@ -115,21 +116,42 @@ function App() {
                             className="me-1"
                             key={`arg-${functionData.name}-${i}`}
                           >
-                            <span className="text-var"> {arg.name}</span>:{" "}
-                            <span className="text-type">{arg.type}</span>
+                            <span className="text-var">
+                              {arg.name || `arg${i}`}
+                            </span>
+                            : <span className="text-type">{arg.type}</span>
+                            {i < functionData.inputs.length - 1 ? (
+                              <span className="text-muted">, </span>
+                            ) : (
+                              ""
+                            )}
                           </span>
                         ))}
                       )
-                      {functionData.constant &&
+                      {functionData.outputs &&
                         functionData.outputs.length > 0 && (
                           <span>
-                            →{" "}
-                            {functionData.outputs.map((output: any) => (
-                              <span key={`output-${functionData.name}`}>
-                                {output.name && <span>{output.name}:</span>}
-                                <span className="text-type">{output.type}</span>
-                              </span>
-                            ))}
+                            → (
+                            {functionData.outputs.map(
+                              (output: any, i: number) => (
+                                <span key={`output-${functionData.name}`}>
+                                  {output.name && (
+                                    <span className="text-var">
+                                      {output.name}:{" "}
+                                    </span>
+                                  )}
+                                  <span className="text-type">
+                                    {output.type}
+                                  </span>
+                                  {i < functionData.outputs.length - 1 ? (
+                                    <span className="text-muted">, </span>
+                                  ) : (
+                                    ""
+                                  )}
+                                </span>
+                              )
+                            )}
+                            )
                           </span>
                         )}
                     </label>

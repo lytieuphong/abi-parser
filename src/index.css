@@ -71,7 +71,7 @@ button:focus-visible {
 }
 
 .text-muted {
-  opacity: 0.5;
+  color: #999;
 }
 .text-type {
   color: #7ab0c0;
@@ -100,4 +100,15 @@ textarea {
     display: block;
     padding: 1rem;
   }
+}
+ul {
+  padding-left: 0;
+  list-style: none;
+  color: #0231fa;
+  li {
+    padding: 3px 0;
+  }
+}
+label {
+  cursor: pointer;
 }
